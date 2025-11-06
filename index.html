@@ -1,492 +1,329 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clay & Scar's Family Magic</title>
+    <title>Clay & Scar's AR Palm Magic</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            color: #5a3e36;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
         }
         
-        .container {
-            max-width: 1200px;
+        #ar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 20px;
+            height: 100%;
         }
         
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            color: #8b4513;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            font-family: 'Brush Script MT', cursive;
-        }
-        
-        .subtitle {
-            font-size: 1.5rem;
-            opacity: 0.9;
-            color: #a0522d;
-            font-style: italic;
-        }
-        
-        .heart {
-            color: #e75480;
-            margin: 0 10px;
-        }
-        
-        .app-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-        
-        .camera-section, .result-section {
-            flex: 1;
-            min-width: 300px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .section-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #8b4513;
-            font-family: 'Brush Script MT', cursive;
-        }
-        
-        #camera-feed {
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 500px;
-            height: 300px;
-            background-color: #f5f5f5;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            height: 100%;
             object-fit: cover;
-            border: 3px solid #e75480;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         
-        .palm-overlay {
-            position: relative;
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 500px;
+            height: 100%;
         }
         
-        .palm-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            border: 3px dashed #e75480;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            pointer-events: none;
-        }
-        
-        .palm-text {
-            color: #e75480;
-            font-weight: bold;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 10px;
-        }
-        
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 50px;
-            background: linear-gradient(to right, #e75480, #ff9a9e);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            font-size: 1rem;
-        }
-        
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        button:active {
-            transform: translateY(1px);
-        }
-        
-        #capture-btn {
-            background: linear-gradient(to right, #8b4513, #a0522d);
-        }
-        
-        #reset-btn {
-            background: linear-gradient(to right, #5a3e36, #8b4513);
-        }
-        
-        .status {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.5);
-            text-align: center;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            font-size: 1.1rem;
-            color: #5a3e36;
-        }
-        
-        #result-image {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            display: none;
-            border: 3px solid #e75480;
-        }
-        
-        .family-message {
-            margin-top: 20px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 20px;
-            border-radius: 15px;
-            width: 100%;
-            font-style: italic;
-            color: #5a3e36;
-        }
-        
-        .instructions {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 25px;
-            border-radius: 20px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .instructions h2 {
-            margin-bottom: 15px;
-            color: #8b4513;
-            text-align: center;
-            font-family: 'Brush Script MT', cursive;
-            font-size: 2.2rem;
-        }
-        
-        .instructions ol {
-            margin-left: 20px;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-        
-        .family-quote {
-            text-align: center;
-            font-style: italic;
-            margin-top: 15px;
-            padding: 10px;
-            border-top: 1px dashed #e75480;
-            border-bottom: 1px dashed #e75480;
-            color: #8b4513;
-        }
-        
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .subtitle {
-                font-size: 1.2rem;
-            }
-        }
-        
-        .floating-hearts {
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: -1;
+            z-index: 100;
         }
         
-        .heart-float {
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 101;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            color: #8b4513;
+            margin: 0;
+            font-family: 'Brush Script MT', cursive;
+        }
+        
+        .header .heart {
+            color: #e75480;
+            margin: 0 5px;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 101;
+            font-size: 1rem;
+            color: #5a3e36;
+            text-align: center;
+            max-width: 90%;
+        }
+        
+        .palm-indicator {
             position: absolute;
-            color: rgba(231, 84, 128, 0.3);
-            font-size: 20px;
-            animation: float 8s linear infinite;
+            border: 3px solid #e75480;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(231, 84, 128, 0.5);
+            pointer-events: none;
+            display: none;
         }
         
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 200;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e75480;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .ar-image {
+            position: absolute;
+            display: none;
+            border: 3px solid #e75480;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(231, 84, 128, 0.6);
+            pointer-events: none;
+            z-index: 50;
         }
     </style>
 </head>
 <body>
-    <div class="floating-hearts" id="hearts-container"></div>
+    <div id="ar-container">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+        <div class="palm-indicator" id="palm-indicator"></div>
+        <img id="ar-image" class="ar-image" alt="Family memory">
+    </div>
     
-    <div class="container">
-        <header>
-            <h1>Clay <span class="heart">♥</span> Scar's Family Magic</h1>
-            <p class="subtitle">Open your palm to reveal a special family memory</p>
-        </header>
-        
-        <div class="app-container">
-            <div class="camera-section">
-                <h2 class="section-title">Your Loving Palm</h2>
-                <div class="palm-overlay">
-                    <video id="camera-feed" autoplay playsinline></video>
-                    <div class="palm-circle">
-                        <div class="palm-text">Place Palm Here</div>
-                    </div>
-                </div>
-                <canvas id="capture-canvas" style="display: none;"></canvas>
-                
-                <div class="controls">
-                    <button id="start-camera">Start Our Magic</button>
-                    <button id="capture-btn">Reveal Memory</button>
-                    <button id="reset-btn">Try Again</button>
-                </div>
-                
-                <div class="status" id="camera-status">
-                    Ready to create magic together...
-                </div>
-            </div>
-            
-            <div class="result-section">
-                <h2 class="section-title">Our Special Memory</h2>
-                <img id="result-image" alt="Our family memory">
-                <div class="status" id="result-status">
-                    Open your palm to reveal our memory
-                </div>
-                
-                <div class="family-message">
-                    <p>"Family is where life begins and love never ends."</p>
-                    <p>- Clay, Scar & Family</p>
-                </div>
-            </div>
+    <div class="overlay">
+        <div class="header">
+            <h1>Clay <span class="heart">♥</span> Scar's AR Palm Magic</h1>
         </div>
-        
-        <div class="instructions">
-            <h2>How to Create Magic</h2>
-            <ol>
-                <li>Click "Start Our Magic" to begin (allow camera access)</li>
-                <li>Hold your open palm inside the circle</li>
-                <li>Click "Reveal Memory" to see our special family image appear in your palm</li>
-                <li>Use "Try Again" to experience the magic once more</li>
-            </ol>
-            <div class="family-quote">
-                "In your hands, you hold our most precious memories"
-            </div>
-        </div>
+        <div class="status" id="status">Initializing hand tracking...</div>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p style="color: #8b4513; font-weight: bold;">Loading hand detection...</p>
     </div>
 
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+
     <script>
-        // DOM Elements
-        const cameraFeed = document.getElementById('camera-feed');
-        const captureCanvas = document.getElementById('capture-canvas');
-        const startCameraBtn = document.getElementById('start-camera');
-        const captureBtn = document.getElementById('capture-btn');
-        const resetBtn = document.getElementById('reset-btn');
-        const cameraStatus = document.getElementById('camera-status');
-        const resultStatus = document.getElementById('result-status');
-        const resultImage = document.getElementById('result-image');
-        const heartsContainer = document.getElementById('hearts-container');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
+        const loading = document.getElementById('loading');
+        const palmIndicator = document.getElementById('palm-indicator');
+        const arImage = document.getElementById('ar-image');
         
-        // Google Drive image - corrected URL format
-        // Changed from: https://drive.google.com/uc?export=view&id=...
-        // To direct download link format:
+        // Your Google Drive image
         const familyImageUrl = 'https://drive.google.com/uc?export=download&id=1tWNOJpBKTIsyKnoN-EfbM7Vi0snhOcXE';
         
-        // Alternative format that also works:
-        const alternativeUrl = 'https://lh3.googleusercontent.com/d/1tWNOJpBKTIsyKnoN-EfbM7Vi0snhOcXE';
+        let handDetected = false;
+        let palmCenter = null;
         
-        let stream = null;
-        let isCameraActive = false;
+        // Preload the image
+        arImage.src = familyImageUrl;
+        arImage.onerror = function() {
+            // Try alternative URL
+            this.src = 'https://lh3.googleusercontent.com/d/1tWNOJpBKTIsyKnoN-EfbM7Vi0snhOcXE';
+        };
         
-        // Create floating hearts
-        function createHearts() {
-            const hearts = ['♥', '❤', '💕', '💖', '💗'];
-            for (let i = 0; i < 15; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'heart-float';
-                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
-                heartsContainer.appendChild(heart);
+        // Set up canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Initialize MediaPipe Hands
+        const hands = new Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            }
+        });
+        
+        hands.setOptions({
+            maxNumHands: 2,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+        
+        hands.onResults(onResults);
+        
+        // Process hand detection results
+        function onResults(results) {
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw video frame
+            ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+            
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                handDetected = true;
+                
+                // Process first detected hand
+                const landmarks = results.multiHandLandmarks[0];
+                
+                // Get palm center (landmark 9 is roughly palm center)
+                const palmLandmark = landmarks[9];
+                const x = palmLandmark.x * canvas.width;
+                const y = palmLandmark.y * canvas.height;
+                
+                // Calculate palm size based on hand landmarks
+                const wrist = landmarks[0];
+                const middleFinger = landmarks[9];
+                const distance = Math.sqrt(
+                    Math.pow((middleFinger.x - wrist.x) * canvas.width, 2) +
+                    Math.pow((middleFinger.y - wrist.y) * canvas.height, 2)
+                );
+                
+                // Calculate hand rotation for more natural placement
+                const wristX = wrist.x * canvas.width;
+                const wristY = wrist.y * canvas.height;
+                const angle = Math.atan2(y - wristY, x - wristX);
+                
+                // Display AR image on palm
+                const imageSize = distance * 1.5;
+                arImage.style.width = imageSize + 'px';
+                arImage.style.height = imageSize + 'px';
+                arImage.style.left = (x - imageSize / 2) + 'px';
+                arImage.style.top = (y - imageSize / 2) + 'px';
+                arImage.style.transform = `rotate(${angle}rad)`;
+                arImage.style.display = 'block';
+                
+                // Show palm indicator
+                palmIndicator.style.width = (distance * 2) + 'px';
+                palmIndicator.style.height = (distance * 2) + 'px';
+                palmIndicator.style.left = (x - distance) + 'px';
+                palmIndicator.style.top = (y - distance) + 'px';
+                palmIndicator.style.display = 'block';
+                
+                // Draw hand landmarks (optional - comment out if you don't want to see them)
+                drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {
+                    color: '#e75480',
+                    lineWidth: 2
+                });
+                drawLandmarks(ctx, landmarks, {
+                    color: '#8b4513',
+                    fillColor: '#fad0c4',
+                    radius: 3
+                });
+                
+                status.textContent = '✨ Palm detected! Image appears in your hand ✨';
+                status.style.background = 'rgba(50, 184, 198, 0.9)';
+                status.style.color = 'white';
+            } else {
+                handDetected = false;
+                arImage.style.display = 'none';
+                palmIndicator.style.display = 'none';
+                status.textContent = '👋 Show your open palm to reveal the magic';
+                status.style.background = 'rgba(255, 255, 255, 0.9)';
+                status.style.color = '#5a3e36';
+            }
+            
+            ctx.restore();
+        }
+        
+        // Start camera
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+                
+                video.srcObject = stream;
+                
+                // Wait for video to be ready
+                video.onloadedmetadata = () => {
+                    video.play();
+                    loading.style.display = 'none';
+                    status.textContent = '👋 Show your open palm to reveal the magic';
+                    
+                    // Start hand detection
+                    const camera = new Camera(video, {
+                        onFrame: async () => {
+                            await hands.send({ image: video });
+                        },
+                        width: 1280,
+                        height: 720
+                    });
+                    camera.start();
+                };
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                loading.innerHTML = '<p style="color: #e75480;">Camera access denied. Please allow camera permissions.</p>';
             }
         }
         
-        // Start camera function
-        startCameraBtn.addEventListener('click', async () => {
-            try {
-                cameraStatus.textContent = 'Starting our magic...';
-                cameraStatus.style.color = '#8b4513';
-                
-                // Get user media
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'user' } 
-                });
-                
-                // Set video source to the stream
-                cameraFeed.srcObject = stream;
-                isCameraActive = true;
-                
-                cameraStatus.textContent = 'Camera is ready! Hold your palm in the circle.';
-                cameraStatus.style.color = '#8b4513';
-                startCameraBtn.disabled = true;
-                captureBtn.disabled = false;
-                
-            } catch (error) {
-                console.error('Error accessing camera:', error);
-                cameraStatus.textContent = 'Unable to access camera. Please check permissions.';
-                cameraStatus.style.color = '#e75480';
-            }
-        });
-        
-        // Capture and analyze function
-        captureBtn.addEventListener('click', () => {
-            if (!isCameraActive) {
-                resultStatus.textContent = 'Please start the camera first.';
-                resultStatus.style.color = '#e75480';
-                return;
-            }
-            
-            // Set canvas dimensions to match video
-            captureCanvas.width = cameraFeed.videoWidth;
-            captureCanvas.height = cameraFeed.videoHeight;
-            
-            // Draw current video frame to canvas
-            const context = captureCanvas.getContext('2d');
-            context.drawImage(cameraFeed, 0, 0, captureCanvas.width, captureCanvas.height);
-            
-            // Simulate palm detection
-            resultStatus.textContent = 'Looking for your loving palm...';
-            resultStatus.style.color = '#8b4513';
-            
-            // Simulate processing delay
-            setTimeout(() => {
-                // In a real app, you would use a proper palm detection algorithm
-                // For this demo, we'll assume the palm is detected
-                const palmDetected = Math.random() > 0.3; // 70% chance of detection
-                
-                if (palmDetected) {
-                    // Display the family image with multiple fallback options
-                    resultImage.onerror = function() {
-                        console.log('First URL failed, trying alternative...');
-                        // Try alternative URL if primary fails
-                        if (this.src !== alternativeUrl) {
-                            this.src = alternativeUrl;
-                        } else {
-                            resultStatus.textContent = 'Image could not be loaded. Please check the Google Drive link sharing settings.';
-                            resultStatus.style.color = '#e75480';
-                        }
-                    };
-                    
-                    resultImage.onload = function() {
-                        console.log('Image loaded successfully!');
-                        resultImage.style.display = 'block';
-                        resultStatus.textContent = 'Palm detected! Our special memory appears.';
-                        resultStatus.style.color = '#8b4513';
-                        
-                        // Add romantic effect
-                        createHearts();
-                    };
-                    
-                    resultImage.src = familyImageUrl;
-                } else {
-                    resultImage.style.display = 'none';
-                    resultStatus.textContent = 'Palm not detected clearly. Try again with your hand open.';
-                    resultStatus.style.color = '#e75480';
-                }
-            }, 2000);
-        });
-        
-        // Reset function
-        resetBtn.addEventListener('click', () => {
-            resultImage.style.display = 'none';
-            resultStatus.textContent = 'Open your palm to reveal our memory';
-            resultStatus.style.color = '#5a3e36';
-            
-            // Clear hearts
-            heartsContainer.innerHTML = '';
-        });
-        
-        // Disable capture button initially
-        captureBtn.disabled = true;
-        
-        // Initialize floating hearts
-        createHearts();
+        // Initialize
+        startCamera();
     </script>
 </body>
 </html>
