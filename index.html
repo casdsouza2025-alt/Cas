@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clay & Scar's Family Magic</title>
     <style>
         * {
@@ -362,11 +362,13 @@
         const resultImage = document.getElementById('result-image');
         const heartsContainer = document.getElementById('hearts-container');
         
-        // Your Google Drive image URL
-        const familyImageUrl = 'https://drive.google.com/uc?export=view&id=1tWNOJpBKTIsyKnoN-EfbM7Vi0snhOcXE';
-
-        // Fallback image in case Google Drive URL doesn't work
-        const fallbackImageUrl = 'https://drive.google.com/uc?export=view&id=1tWNOJpBKTIsyKnoN-EfbM7Vi0snhOcXE';
+        // Google Drive image - corrected URL format
+        // Changed from: https://drive.google.com/uc?export=view&id=...
+        // To direct download link format:
+        const familyImageUrl = 'https://drive.google.com/uc?export=download&id=1tWNOJpBKTIsyKnoN-EfbM7Vi0snhOcXE';
+        
+        // Alternative format that also works:
+        const alternativeUrl = 'https://lh3.googleusercontent.com/d/1tWNOJpBKTIsyKnoN-EfbM7Vi0snhOcXE';
         
         let stream = null;
         let isCameraActive = false;
@@ -439,19 +441,29 @@
                 const palmDetected = Math.random() > 0.3; // 70% chance of detection
                 
                 if (palmDetected) {
-                    // Display the family image
+                    // Display the family image with multiple fallback options
                     resultImage.onerror = function() {
-                        // If Google Drive image fails, use fallback
-                        resultImage.src = fallbackImageUrl;
+                        console.log('First URL failed, trying alternative...');
+                        // Try alternative URL if primary fails
+                        if (this.src !== alternativeUrl) {
+                            this.src = alternativeUrl;
+                        } else {
+                            resultStatus.textContent = 'Image could not be loaded. Please check the Google Drive link sharing settings.';
+                            resultStatus.style.color = '#e75480';
+                        }
+                    };
+                    
+                    resultImage.onload = function() {
+                        console.log('Image loaded successfully!');
+                        resultImage.style.display = 'block';
+                        resultStatus.textContent = 'Palm detected! Our special memory appears.';
+                        resultStatus.style.color = '#8b4513';
+                        
+                        // Add romantic effect
+                        createHearts();
                     };
                     
                     resultImage.src = familyImageUrl;
-                    resultImage.style.display = 'block';
-                    resultStatus.textContent = 'Palm detected! Our special memory appears.';
-                    resultStatus.style.color = '#8b4513';
-                    
-                    // Add romantic effect
-                    createHearts();
                 } else {
                     resultImage.style.display = 'none';
                     resultStatus.textContent = 'Palm not detected clearly. Try again with your hand open.';
